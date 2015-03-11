@@ -33,13 +33,23 @@ module.exports = function(grunt){
         src: ['**/**'],
         dest: '/updapp'
       },
-      win:{
+      win32:{
         options: {
           mode: 'zip',
-          archive: dest + '/updapp/win/updapp.zip'
+          archive: dest + '/updapp/win32/updapp.zip'
         },
         expand: true,
-        cwd: dest + '/updapp/win/',
+        cwd: dest + '/updapp/win32/',
+        src: ['**/**'],
+        dest: '/updapp'
+      },
+      win64:{
+        options: {
+          mode: 'zip',
+          archive: dest + '/updapp/win64/updapp.zip'
+        },
+        expand: true,
+        cwd: dest + '/updapp/win64/',
         src: ['**/**'],
         dest: '/updapp'
       },

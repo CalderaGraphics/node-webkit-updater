@@ -10,7 +10,8 @@
   var gui = global.window.nwDispatcher.requireNwGui();
 
   var platform = process.platform;
-  platform = /^win/.test(platform)? 'win' : /^darwin/.test(platform)? 'mac' : 'linux' + (process.arch == 'ia32' ? '32' : '64');
+  platform = /^win/.test(platform)? 'win' : /^darwin/.test(platform)? 'mac' : 'linux';
+  platform += (process.arch == 'ia32' ? '32' : '64');
 
 
   /**
@@ -111,10 +112,8 @@
   updater.prototype.getAppPath = function(){
     var appPath = {
       mac: path.join(process.cwd(),'../../..'),
-      win: path.dirname(process.execPath)
     };
-    appPath.linux32 = appPath.win;
-    appPath.linux64 = appPath.win;
+    appPath.win32 = appPath.win64 = appPath.linux32 = appPath.linux64 = path.dirname(process.execPath);
     return appPath[platform];
   };
 
@@ -127,7 +126,8 @@
     var execFolder = this.getAppPath();
     var exec = {
       mac: '',
-      win: path.basename(process.execPath),
+      win32: path.basename(process.execPath),
+      win64: path.basename(process.execPath),
       linux32: path.basename(process.execPath),
       linux64: path.basename(process.execPath)
     };
@@ -168,7 +168,8 @@
       }
       else {
         var suffix = {
-          win: '.exe',
+          win32: '.exe',
+          win64: '.exe',
           mac: '.app'
         };
         return manifest.name + (suffix[platform] || '');
@@ -234,7 +235,7 @@
     /**
      * @private
      */
-    win: function(filename, cb, manifest){
+    win32: function(filename, cb, manifest){
       var destinationDirectory = getZipDestinationDirectory(filename),
           unzip = function(){
             // unzip by C. Spieler (docs: https://www.mkssoftware.com/docs/man1/unzip.1.asp, issues: http://www.info-zip.org/)
@@ -280,6 +281,7 @@
       })
      }
   };
+  pUnpack.win64 = pUnpack.win32;
   pUnpack.linux64 = pUnpack.linux32;
 
 
@@ -310,7 +312,7 @@
     /**
      * @private
      */
-    win: function(appPath, args, options, cb){
+    win32: function(appPath, args, options, cb){
       return run(appPath, args, options, cb);
     },
     /**
@@ -325,6 +327,7 @@
     }
   };
 
+  pRun.win64 = pRun.win32;
   pRun.linux64 = pRun.linux32;
 
   /**
@@ -361,7 +364,7 @@
     /**
      * @private
      */
-    win: function(to, cb){
+    win32: function(to, cb){
       var self = this;
       var errCounter = 50;
       deleteApp(appDeleted);
@@ -399,6 +402,7 @@
       ncp(this.getAppPath(), to, cb);
     }
   };
+  pInstall.win64 = pInstall.win32;
   pInstall.linux64 = pInstall.linux32;
 
   /**

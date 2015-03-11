@@ -7,6 +7,7 @@ var chokidar = require('chokidar');
 var isWin = /^win/.test(process.platform);
 var isMac = /^darwin/.test(process.platform);
 var isLinux = /^linux/.test(process.platform);
+var arch = (process.arch == 'ia32') ? '32' : '64';
 var path = require('path');
 var fs = require('fs');
 var getPort = require('get-port');
@@ -37,8 +38,12 @@ describe('build app: copy current to temp', function buildApp(){
               url: "http://localhost:" + port + "/updapp/osx/updapp.zip",
               execPath: "updapp/updapp.app"
           },
-          win: {
-              url: "http://localhost:" + port + "/updapp/win/updapp.zip",
+          win32: {
+              url: "http://localhost:" + port + "/updapp/win32/updapp.zip",
+              execPath: "updapp\\updapp.exe"
+          },
+          win64: {
+              url: "http://localhost:" + port + "/updapp/win64/updapp.zip",
               execPath: "updapp\\updapp.exe"
           },
           linux32: {
@@ -72,8 +77,8 @@ describe('build app: copy current to temp', function buildApp(){
         
         var pkgCommand;
         if(isMac) pkgCommand = 'packageMacZip';//'packageMac';
-        if(isWin) pkgCommand = 'compress:win';
-        if(isLinux) pkgCommand = 'compress:linux' + (process.arch == 'ia32'?'32':'64');
+        if(isWin) pkgCommand = 'compress:win' + arch;
+        if(isLinux) pkgCommand = 'compress:linux' + arch;
         console.log(pkgCommand)
 
         
@@ -116,8 +121,12 @@ describe('build app: copy current to temp', function buildApp(){
                     url: "http://localhost:" + port + "/updapp/osx/updapp.zip",
                     execPath: "updapp/updapp.app"
                 },
-                win: {
-                    url: "http://localhost:" + port + "/updapp/win/updapp.zip",
+                win32: {
+                    url: "http://localhost:" + port + "/updapp/win32/updapp.zip",
+                    execPath: "updapp\\updapp.exe"
+                },
+                win64: {
+                    url: "http://localhost:" + port + "/updapp/win64/updapp.zip",
                     execPath: "updapp\\updapp.exe"
                 },
                 linux32: {
@@ -142,9 +151,13 @@ describe('build app: copy current to temp', function buildApp(){
                 dir: 'osx/',
                 run: 'open ' + __dirname + "/deploy0.1/updapp/osx/updapp.app"
               },
-              win:{
-                dir: 'win/',
-                run: path.join(__dirname, "/deploy0.1/updapp/win/updapp.exe")
+              win32:{
+                dir: 'win32/',
+                run: path.join(__dirname, "/deploy0.1/updapp/win32/updapp.exe")
+              },
+              win64:{
+                dir: 'win64/',
+                run: path.join(__dirname, "/deploy0.1/updapp/win64/updapp.exe")
               },
               linux32: {
                 dir: 'linux32/',
@@ -156,13 +169,13 @@ describe('build app: copy current to temp', function buildApp(){
               }
             };
             if(isMac) os = os.mac;
-            if(isWin) os = os.win;
-            if(isLinux) os = os['linux' + (process.arch == 'ia32'?'32':'64')];
+            if(isWin) os = os['win' + arch];
+            if(isLinux) os = os['linux' + arch];
 
-		app.get('/version/0.0.2', function(req, res){
-		  res.end();
-		  done();
-		});
+			app.get('/version/0.0.2', function(req, res){
+			  res.end();
+			  done();
+			});
             
             exec(os.run, function(err, stdo, stder){
               console.log(arguments)
